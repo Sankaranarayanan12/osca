@@ -29,7 +29,7 @@ export function AppSidebar() {
   ];
 
   return (
-    <Sidebar className="border-r border-white/[0.05] bg-black text-white">
+    <Sidebar className="fixed inset-y-0 left-0 z-50 w-64 -translate-x-full border-r border-white/[0.05] bg-black text-white transition-transform duration-300 md:translate-x-0">
       <SidebarHeader className="p-6 bg-black flex-shrink-0">
         <div className="flex items-center gap-1.5 mt-2 justify-center w-full">
           <span className="text-3xl font-semibold tracking-tight italic text-white font-serif">
@@ -38,7 +38,7 @@ export function AppSidebar() {
           <span className="w-2 h-2 rounded-full bg-emerald-500" />
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent className="px-4 py-2 bg-black">
         <SidebarGroup>
           <SidebarGroupContent>

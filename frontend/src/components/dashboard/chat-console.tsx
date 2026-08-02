@@ -2,20 +2,12 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ArrowRight, Code2, Bot, User as UserIcon, ExternalLink, Check, Copy, Sparkles, PlusCircle, ArrowDown, Compass } from "lucide-react";
+import { Search, ArrowRight, Code2, Bot, User as UserIcon, ExternalLink, Check, Copy, Sparkles, PlusCircle, ArrowDown } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Image from 'next/image';
 
-const SUGGESTED_PROMPTS = [
-  "I'm a React dev looking to learn Rust. Where should I start?",
-  "Find beginner-friendly Python repos with good mentorship",
-  "What are trending Go projects that need contributors?",
-  "Suggest ML repos suited for someone who knows PyTorch",
-];
-
-// Custom Github SVG Icon
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     viewBox="0 0 24 24"
@@ -38,7 +30,6 @@ interface Message {
   content: string;
 }
 
-// Render a beautiful card for GitHub links
 const renderLink = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   const { href, children } = props;
   if (href?.startsWith('https://github.com/')) {
@@ -50,7 +41,6 @@ const renderLink = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
         rel="noopener noreferrer"
         className="group relative flex items-center justify-between p-4 my-4 rounded-2xl bg-neutral-900/40 border border-white/[0.08] hover:border-emerald-500/30 hover:bg-neutral-900/80 transition-all duration-300 overflow-hidden no-underline w-full max-w-md shadow-lg"
       >
-        {/* Subtle gradient hover background */}
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/0 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         <div className="flex items-center gap-4 relative z-10">
@@ -76,9 +66,6 @@ const renderLink = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   return <a {...props} className="text-emerald-400 hover:text-emerald-300 hover:underline underline-offset-4 transition-colors" />;
 };
 
-// Renders assistant content with a soft, natural "materialising" typewriter reveal.
-// The backend responds with the full message at once, so this simulates a completion
-// animation client-side rather than a real token stream.
 function StreamingAssistantContent({
   content,
   streaming,
@@ -100,7 +87,7 @@ function StreamingAssistantContent({
     let frame = 0;
     const totalTicks = 42;
     const chunk = Math.max(1, Math.ceil(content.length / totalTicks));
-    
+
     const interval = setInterval(() => {
       frame += 1;
       setRevealed((prev) => Math.min(content.length, prev + chunk));
@@ -141,7 +128,6 @@ function CopyButton({ text }: { text: string }) {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1600);
     } catch {
-      // Clipboard API unavailable — silently ignore.
     }
   }, [text]);
 
@@ -183,7 +169,6 @@ export function ChatConsole() {
     }
   }, [messages, streamingMessage, isLoading]);
 
-  // Auto-grow the textarea up to a sensible cap, then let it scroll internally.
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
@@ -207,11 +192,6 @@ export function ChatConsole() {
     setStreamingMessage(null);
     setIsLoading(false);
     setSearchQuery("");
-  }, []);
-
-  const submitPrompt = useCallback((prompt: string) => {
-    setSearchQuery(prompt);
-    window.setTimeout(() => textareaRef.current?.focus(), 0);
   }, []);
 
   const handleSearchSubmit = async (e: React.FormEvent) => {
@@ -255,7 +235,6 @@ export function ChatConsole() {
 
   const handleStreamDone = useCallback((content: string) => {
     setMessages((prev) => {
-      // Prevent duplicates in case of race conditions
       if (prev.length > 0 && prev[prev.length - 1].content === content) {
         return prev;
       }
@@ -275,7 +254,6 @@ export function ChatConsole() {
 
   return (
     <div className={`relative w-full flex flex-col items-center max-w-4xl mx-auto z-10 h-full max-h-[85vh] ${messages.length === 0 ? 'justify-center' : ''}`}>
-      {/* Conversation Header */}
       {messages.length > 0 && (
         <div className="w-full flex items-center justify-between gap-3 px-3 sm:px-4 pb-3 sm:pb-4 mb-2 border-b border-white/[0.06] animate-in fade-in duration-500">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -304,30 +282,12 @@ export function ChatConsole() {
       {messages.length === 0 ? (
         <div className="space-y-6 sm:space-y-8 text-center mb-8 sm:mb-10 animate-in slide-in-from-bottom-4 fade-in duration-700 ease-out px-2">
           <div className="space-y-3 sm:space-y-4">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/[0.08] border border-emerald-500/20 text-[11px] font-medium tracking-wide text-emerald-300 uppercase">
-              <Sparkles className="w-3 h-3" />
-              AI-powered matchmaking
-            </div>
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-light tracking-tight text-white leading-tight">
-              {greeting}, <span className="font-serif italic font-medium text-emerald-400">{user?.name.split(" ")[0] || "Developer"}</span>
+            <h1 className="font-mona-sans font-semibold text-3xl sm:text-4xl md:text-5xl leading-tight tracking-[0%] text-center text-white">
+              {greeting}, <span className="font-libre-baskerville italic font-medium text-emerald-400">{user?.name.split(" ")[0] || "Developer"}</span>
             </h1>
-            <p className="text-neutral-400 text-sm sm:text-base md:text-lg font-light max-w-xl mx-auto leading-relaxed">
-              I am OscaBot. Tell me about your skills and let&apos;s find the perfect open-source repository for your next contribution.
+            <p className="font-mona-sans font-semibold text-base sm:text-lg md:text-xl leading-snug tracking-[0%] text-center text-neutral-400 max-w-xl mx-auto">
+              Search repositories, verify match scores, and explore personalized roadmaps
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-xl mx-auto px-2 sm:px-4">
-            {SUGGESTED_PROMPTS.map((prompt) => (
-              <button
-                key={prompt}
-                type="button"
-                onClick={() => submitPrompt(prompt)}
-                className="group text-left flex items-start gap-2.5 px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.05] hover:border-emerald-500/20 text-sm text-neutral-400 hover:text-neutral-200 transition-all duration-200"
-              >
-                <Compass className="w-4 h-4 mt-0.5 text-neutral-600 group-hover:text-emerald-400 transition-colors flex-shrink-0" />
-                <span className="font-light leading-snug">{prompt}</span>
-              </button>
-            ))}
           </div>
         </div>
       ) : (
@@ -338,8 +298,6 @@ export function ChatConsole() {
         >
           {messages.map((msg, index) => (
             <div key={index} className={`group/msg flex gap-2.5 sm:gap-4 w-full animate-in slide-in-from-bottom-3 fade-in duration-500 ease-out ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-
-              {/* Assistant Avatar */}
               {msg.role === 'assistant' && (
                 <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-b from-emerald-500/20 to-emerald-500/5 flex items-center justify-center flex-shrink-0 mt-1 border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.15)] backdrop-blur-md">
                   <Bot className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-emerald-400" />
@@ -363,7 +321,6 @@ export function ChatConsole() {
                 )}
               </div>
 
-              {/* User Avatar */}
               {msg.role === 'user' && (
                 <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 mt-1 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)] backdrop-blur-md overflow-hidden relative">
                   {user?.avatarUrl ? (
@@ -376,7 +333,6 @@ export function ChatConsole() {
             </div>
           ))}
 
-          {/* Live streaming assistant reply */}
           {streamingMessage !== null && (
             <div className="flex gap-2.5 sm:gap-4 justify-start w-full animate-in slide-in-from-bottom-3 fade-in duration-400 ease-out">
               <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-b from-emerald-500/25 to-emerald-500/5 flex items-center justify-center flex-shrink-0 mt-1 border border-emerald-500/40 shadow-[0_0_24px_rgba(16,185,129,0.25)] backdrop-blur-md">
@@ -388,7 +344,6 @@ export function ChatConsole() {
             </div>
           )}
 
-          {/* Thinking indicator */}
           {isLoading && (
             <div className="flex gap-2.5 sm:gap-4 justify-start w-full animate-in fade-in duration-300">
               <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-b from-emerald-500/20 to-emerald-500/5 flex items-center justify-center flex-shrink-0 mt-1 border border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.15)] backdrop-blur-md">
@@ -405,7 +360,6 @@ export function ChatConsole() {
         </div>
       )}
 
-      {/* Scroll to latest button */}
       {showScrollButton && messages.length > 0 && (
         <button
           type="button"
@@ -417,10 +371,8 @@ export function ChatConsole() {
         </button>
       )}
 
-      {/* Modern Input Container */}
       <div className={`w-full px-3 sm:px-4 shrink-0 pb-3 sm:pb-4 ${messages.length > 0 ? 'mt-auto' : ''}`}>
         <form onSubmit={handleSearchSubmit} className="w-full relative group">
-          {/* Glowing background effect */}
           <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 via-emerald-500/10 to-emerald-500/20 rounded-[28px] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
           <div className="relative w-full bg-neutral-950/60 border border-white/[0.08] rounded-[24px] p-2 flex flex-col shadow-2xl backdrop-blur-2xl transition-all duration-300 focus-within:border-emerald-500/30 focus-within:bg-neutral-950/80">
@@ -442,31 +394,30 @@ export function ChatConsole() {
               <button
                 type="submit"
                 disabled={!searchQuery.trim() || isBusy}
-                className="self-end p-2.5 rounded-xl bg-white text-neutral-950 font-semibold active:scale-95 transition-all duration-300 shadow-lg disabled:opacity-30 disabled:active:scale-100 disabled:hover:bg-white hover:bg-emerald-400 hover:text-emerald-950 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] ml-1 sm:ml-2 shrink-0"
+                className="self-end p-2.5 rounded-xl bg-[#10B981] active:scale-95 transition-all duration-300 shadow-lg disabled:opacity-30 disabled:active:scale-100 ml-1 sm:ml-2 shrink-0"
               >
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-[#000000]" />
               </button>
             </div>
 
-            {/* Quick Actions Footer */}
             {messages.length === 0 && (
               <div className="flex items-center justify-between border-t border-white/[0.04] pt-3 px-2 sm:px-3 pb-1 mt-1">
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() => router.push('/dashboard/repositories')}
-                    className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.06] hover:border-white/[0.1] text-xs text-neutral-400 hover:text-neutral-200 transition-all duration-200"
+                    className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.06] hover:border-white/[0.1] transition-all duration-200"
                   >
-                    <GithubIcon className="w-3.5 h-3.5" />
-                    <span className="hidden xs:inline sm:inline">Browse All Repositories</span>
-                    <span className="inline xs:hidden sm:hidden">Repositories</span>
+                    <GithubIcon className="w-3.5 h-3.5 text-[#EEF0F2]" />
+                    <span className="hidden xs:inline sm:inline font-mona-sans font-semibold text-[13.65px] leading-[20.47px] tracking-[0%] text-center align-middle text-[#EEF0F2]">Browse All Repositories</span>
+                    <span className="inline xs:hidden sm:hidden font-mona-sans font-semibold text-[13.65px] leading-[20.47px] tracking-[0%] text-center align-middle text-[#EEF0F2]">Repositories</span>
                   </button>
                   <button
                     type="button"
-                    className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.06] hover:border-white/[0.1] text-xs text-neutral-400 hover:text-neutral-200 transition-all duration-200"
+                    className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.06] hover:border-white/[0.1] transition-all duration-200"
                   >
-                    <Code2 className="w-3.5 h-3.5" />
-                    Languages
+                    <Code2 className="w-3.5 h-3.5 text-[#EEF0F2]" />
+                    <span className="font-mona-sans font-semibold text-[13.65px] leading-[20.47px] tracking-[0%] text-center align-middle text-[#EEF0F2]">Languages</span>
                   </button>
                 </div>
               </div>
